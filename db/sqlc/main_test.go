@@ -11,7 +11,7 @@ import (
 
 const (
 	dbDriver = "postgres"
-	dbURI = "postgresql://mono_finance:Akinyemi@localhost:5432/mono_finance?sslmode=disable"
+	dbURI    = "postgresql://mono_finance:Akinyemi@localhost:5432/mono_finance?sslmode=disable"
 )
 
 var testQueries *Queries
