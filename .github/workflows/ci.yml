@@ -14,8 +14,8 @@ jobs:
       postgres:
         image: postgres:12
         env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: secret
+          POSTGRES_USER: mono_finance
+          POSTGRES_PASSWORD: Akinyemi
           POSTGRES_DB: mono_finance
         options: >-
           --health-cmd pg_isready
