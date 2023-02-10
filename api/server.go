@@ -5,9 +5,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//A Server serves HTTP requests for the banking system
+// A Server serves HTTP requests for the banking system
 type Server struct {
-	store *db.Store
+	store  *db.Store
 	router *gin.Engine
 }
 
@@ -26,7 +26,7 @@ func NewServer(store *db.Store) *Server {
 	return server
 }
 
-//Start run the HTTP server on a specific address.
+// Start run the HTTP server on a specific address.
 func (s *Server) Start(address string) error {
 	return s.router.Run(address)
 }

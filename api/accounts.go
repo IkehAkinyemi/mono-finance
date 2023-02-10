@@ -122,8 +122,8 @@ func (s *Server) updateAccount(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.UpdateAccountParams {
-		ID: req.ID,
+	arg := db.UpdateAccountParams{
+		ID:      req.ID,
 		Balance: account.Balance + reqBody.Balance,
 	}
 
@@ -148,7 +148,7 @@ func (s *Server) DeleteAccount(ctx *gin.Context) {
 		return
 	}
 
-	err :=  s.store.DeleteAccount(ctx, req.ID)
+	err := s.store.DeleteAccount(ctx, req.ID)
 	if err != nil {
 		switch {
 		case err == sql.ErrNoRows:

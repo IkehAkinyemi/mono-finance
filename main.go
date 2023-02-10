@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	dbDriver = "postgres"
-	dbURI    = "postgresql://mono_finance:Akinyemi@localhost:5432/mono_finance?sslmode=disable"
+	dbDriver      = "postgres"
+	dbURI         = "postgresql://mono_finance:Akinyemi@localhost:5432/mono_finance?sslmode=disable"
 	serverAddress = "0.0.0.0:8080"
 )
 
