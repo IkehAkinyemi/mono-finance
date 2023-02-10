@@ -7,17 +7,17 @@ import (
 
 	"github.com/IkehAkinyemi/mono-finance/api"
 	db "github.com/IkehAkinyemi/mono-finance/db/sqlc"
+	"github.com/IkehAkinyemi/mono-finance/utils"
 	_ "github.com/lib/pq"
 )
 
-const (
-	dbDriver      = "postgres"
-	dbURI         = "postgresql://mono_finance:Akinyemi@localhost:5432/mono_finance?sslmode=disable"
-	serverAddress = "0.0.0.0:8080"
-)
-
 func main() {
-	conn, err := sql.Open(dbDriver, dbURI)
+	config, err := utils.LoadConfig(".")
+	if err != nil {
+		log.Fatal("could not load config file", err)
+	}
+
+	conn, err := sql.Open(config.DBDriver, config.DBSource)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -25,7 +25,7 @@ func main() {
 	store := db.NewStore(conn)
 
 	server := api.NewServer(store)
-	if err := server.Start(fmt.Sprint(serverAddress)); err != nil {
+	if err := server.Start(fmt.Sprint(config.ServerAddress)); err != nil {
 		log.Fatalf("error occur starting server: %v", err)
 	}
 }
