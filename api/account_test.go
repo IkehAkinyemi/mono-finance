@@ -106,38 +106,109 @@ func TestGetAccountAPI(t *testing.T) {
 
 func TestCreateAccountAPI(t *testing.T) {
 	account := randomAccount()
-	arg := db.CreateAccountParams{
-		Owner: account.Owner,
-		Currency: account.Currency,
-		Balance: 0,
+
+	testCases := []struct {
+		name          string
+		genReqBody    func() io.Reader
+		buildStubs    func(store *mockdb.MockStore)
+		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name: "OK",
+			buildStubs: func(store *mockdb.MockStore) {
+				arg := db.CreateAccountParams{
+					Owner:    account.Owner,
+					Currency: account.Currency,
+					Balance:  0,
+				}
+
+				store.EXPECT().
+					CreateAccount(gomock.Any(), gomock.Eq(arg)).
+					Times(1).
+					Return(account, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusCreated, recorder.Code)
+			},
+			genReqBody: func() io.Reader {
+				reqBody := createAccountRequest{
+					Owner:    account.Owner,
+					Currency: account.Currency,
+				}
+				return writeRequestBody(reqBody)
+			},
+		},
+		{
+			name: "BadRequest",
+			buildStubs: func(store *mockdb.MockStore) {
+				arg := db.CreateAccountParams{
+					Owner:    account.Owner,
+					Currency: account.Currency,
+					Balance:  0,
+				}
+
+				store.EXPECT().
+					CreateAccount(gomock.Any(), gomock.Eq(arg)).
+					Times(1).
+					Return(account, nil)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+			genReqBody: func() io.Reader {
+				reqBody := createAccountRequest{}
+				return writeRequestBody(reqBody)
+			},
+		},
+		{
+			name: "InternalError",
+			buildStubs: func(store *mockdb.MockStore) {
+				arg := db.CreateAccountParams{
+					Owner:    account.Owner,
+					Currency: account.Currency,
+					Balance:  0,
+				}
+
+				store.EXPECT().
+					CreateAccount(gomock.Any(), gomock.Eq(arg)).
+					Times(1).
+					Return(db.Account{}, sql.ErrConnDone)
+			},
+			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				fmt.Println(recorder.Code)
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+			genReqBody: func() io.Reader {
+				reqBody := createAccountRequest{
+					Owner:    account.Owner,
+					Currency: account.Currency,
+				}
+				return writeRequestBody(reqBody)
+			},
+		},
 	}
 
-	ctrl := gomock.NewController(t)
-	ctrl.Finish()
+	for i := range testCases {
+		tc := testCases[i]
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			ctrl.Finish()
 
-	store := mockdb.NewMockStore(ctrl)
-	store.EXPECT().
-		CreateAccount(gomock.Any(), gomock.Eq(arg)).
-		Times(1).
-		Return(account, nil)
+			store := mockdb.NewMockStore(ctrl)
+			tc.buildStubs(store)
 
-	server := NewServer(store)
-	recorder := httptest.NewRecorder()
+			server := NewServer(store)
+			recorder := httptest.NewRecorder()
 
-	reqBody := createAccountRequest{
-		Owner: account.Owner,
-		Currency: account.Currency,
+			buf := tc.genReqBody()
+
+			request, err := http.NewRequest(http.MethodPost, "/accounts", buf)
+			require.NoError(t, err)
+
+			server.router.ServeHTTP(recorder, request)
+			tc.checkResponse(t, recorder)
+		})
 	}
-	buf := writeRequestBody(reqBody)
-	fmt.Printf("%+v\n", account)
-	fmt.Println(buf)
-	
-
-	request, err := http.NewRequest(http.MethodPost, "/accounts", buf)
-	require.NoError(t, err)
-
-	server.router.ServeHTTP(recorder, request)
-	require.Equal(t, http.StatusCreated, recorder.Code)
 }
 
 func requireBodyMatchAccount(t *testing.T, body *bytes.Buffer, account db.Account) {
@@ -165,4 +236,3 @@ func writeRequestBody(data interface{}) io.Reader {
 
 	return reqBody
 }
-

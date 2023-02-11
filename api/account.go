@@ -2,7 +2,6 @@ package api
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 
 	db "github.com/IkehAkinyemi/mono-finance/db/sqlc"
@@ -18,12 +17,9 @@ func (s *Server) createAccount(ctx *gin.Context) {
 	var req createAccountRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		fmt.Printf("%+v", req)
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
-
-	fmt.Printf("%+v", req)
 
 	arg := db.CreateAccountParams{
 		Owner:    req.Owner,
