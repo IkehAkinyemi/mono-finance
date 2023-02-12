@@ -111,7 +111,12 @@ func (s *Server) updateAccount(ctx *gin.Context) {
 		return
 	}
 
-	account, err := s.store.GetAccountForUpdate(ctx, req.ID)
+	arg := db.AddAccountBalanceParams{
+		ID:     req.ID,
+		Amount: reqBody.Balance,
+	}
+
+	account, err := s.store.AddAccountBalance(ctx, arg)
 	if err != nil {
 		switch {
 		case err == sql.ErrNoRows:
@@ -119,17 +124,6 @@ func (s *Server) updateAccount(ctx *gin.Context) {
 		default:
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		}
-		return
-	}
-
-	arg := db.UpdateAccountParams{
-		ID:      req.ID,
-		Balance: account.Balance + reqBody.Balance,
-	}
-
-	account, err = s.store.UpdateAccount(ctx, arg)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
