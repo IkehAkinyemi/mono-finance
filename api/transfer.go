@@ -10,10 +10,10 @@ import (
 )
 
 type transferRequest struct {
-	FromAccountID int64 `json:"from_account_id" binding:"required,min=1"`
-	ToAccountID int64 `json:"to_account_id" binding:"required,min=1"`
-	Amount int64 `json:"amount" binding:"required"`
-	Currency string `json:"currency" binding:"required,currency"`
+	FromAccountID int64  `json:"from_account_id" binding:"required,min=1"`
+	ToAccountID   int64  `json:"to_account_id" binding:"required,min=1"`
+	Amount        int64  `json:"amount" binding:"required"`
+	Currency      string `json:"currency" binding:"required,currency"`
 }
 
 func (s *Server) createTransfer(ctx *gin.Context) {
@@ -34,8 +34,8 @@ func (s *Server) createTransfer(ctx *gin.Context) {
 
 	arg := db.TransferTxParams{
 		FromAccountID: req.FromAccountID,
-		ToAccountID: req.ToAccountID,
-		Amount: req.Amount,
+		ToAccountID:   req.ToAccountID,
+		Amount:        req.Amount,
 	}
 
 	result, err := s.store.TransferTx(ctx, arg)
@@ -50,7 +50,7 @@ func (s *Server) createTransfer(ctx *gin.Context) {
 func (s *Server) validAccount(ctx *gin.Context, accountID int64, currency string) bool {
 	account, err := s.store.GetAccount(ctx, accountID)
 	if err != nil {
-		if err == sql.ErrNoRows{
+		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusBadRequest, errorResponse(err))
 			return false
 		}

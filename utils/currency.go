@@ -17,4 +17,3 @@ func IsSupportedCurrency(currency string) bool {
 
 	return false
 }
-

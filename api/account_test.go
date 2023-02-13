@@ -136,7 +136,7 @@ func TestCreateAccountAPI(t *testing.T) {
 					Owner:    account.Owner,
 					Currency: account.Currency,
 				}
-				return writeRequestBody(reqBody)
+				return writeRequestBody(t, reqBody)
 			},
 		},
 		{
@@ -151,7 +151,7 @@ func TestCreateAccountAPI(t *testing.T) {
 			},
 			genReqBody: func() io.Reader {
 				reqBody := createAccountRequest{}
-				return writeRequestBody(reqBody)
+				return writeRequestBody(t, reqBody)
 			},
 		},
 		{
@@ -177,7 +177,7 @@ func TestCreateAccountAPI(t *testing.T) {
 					Owner:    account.Owner,
 					Currency: account.Currency,
 				}
-				return writeRequestBody(reqBody)
+				return writeRequestBody(t, reqBody)
 			},
 		},
 	}
@@ -231,7 +231,7 @@ func TestListAccountsAPI(t *testing.T) {
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
-				requireBodyMatchAccount(t, recorder.Body, []db.Account{account1, account2})
+				requireBodyMatchAccounts(t, recorder.Body, []db.Account{account1, account2})
 			},
 		},
 		{
@@ -333,7 +333,7 @@ func TestUpdateAccount(t *testing.T) {
 				requireBodyMatchAccount(t, recorder.Body, account2)
 			},
 			genReqBody: func() io.Reader {
-				return writeRequestBody(reqBody)
+				return writeRequestBody(t, reqBody)
 			},
 		},
 		{
@@ -348,7 +348,7 @@ func TestUpdateAccount(t *testing.T) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
 			},
 			genReqBody: func() io.Reader {
-				return writeRequestBody(updateAccountRequestBalance{})
+				return writeRequestBody(t, updateAccountRequestBalance{})
 			},
 		},
 		{
@@ -363,7 +363,7 @@ func TestUpdateAccount(t *testing.T) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
 			},
 			genReqBody: func() io.Reader {
-				return writeRequestBody(reqBody)
+				return writeRequestBody(t, reqBody)
 			},
 		},
 		{
@@ -379,7 +379,7 @@ func TestUpdateAccount(t *testing.T) {
 				require.Equal(t, http.StatusNotFound, recorder.Code)
 			},
 			genReqBody: func() io.Reader {
-				return writeRequestBody(reqBody)
+				return writeRequestBody(t, reqBody)
 			},
 		},
 		{
@@ -395,7 +395,7 @@ func TestUpdateAccount(t *testing.T) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
 			},
 			genReqBody: func() io.Reader {
-				return writeRequestBody(reqBody)
+				return writeRequestBody(t, reqBody)
 			},
 		},
 	}
@@ -509,23 +509,24 @@ func TestDeleteAccount(t *testing.T) {
 	}
 }
 
-func requireBodyMatchAccount(t *testing.T, body *bytes.Buffer, expected interface{}) {
+func requireBodyMatchAccount(t *testing.T, body *bytes.Buffer, account db.Account) {
 	data, err := io.ReadAll(body)
 	require.NoError(t, err)
 
-	switch expected.(type) {
-	case []db.Account:
-		var gotAccounts []db.Account
-		err = json.Unmarshal(data, &gotAccounts)
-		require.NoError(t, err)
-		require.Equal(t, gotAccounts, expected)
-		return
-	default:
-		var gotAccount db.Account
-		err = json.Unmarshal(data, &gotAccount)
-		require.Equal(t, gotAccount, expected)
-		require.NoError(t, err)
-	}
+	var gotAccount db.Account
+	err = json.Unmarshal(data, &gotAccount)
+	require.NoError(t, err)
+	require.Equal(t, account, gotAccount)
+}
+
+func requireBodyMatchAccounts(t *testing.T, body *bytes.Buffer, accounts []db.Account) {
+	data, err := io.ReadAll(body)
+	require.NoError(t, err)
+
+	var gotAccounts []db.Account
+	err = json.Unmarshal(data, &gotAccounts)
+	require.NoError(t, err)
+	require.Equal(t, accounts, gotAccounts)
 }
 
 func randomAccount() db.Account {
@@ -537,9 +538,9 @@ func randomAccount() db.Account {
 	}
 }
 
-func writeRequestBody(data interface{}) io.Reader {
-	reqBody := bytes.NewBuffer([]byte{})
-	json.NewEncoder(reqBody).Encode(&data)
+func writeRequestBody(t *testing.T, data interface{}) io.Reader {
+	buf, err := json.Marshal(data)
+	require.NoError(t, err)
 
-	return reqBody
+	return bytes.NewReader(buf)
 }
