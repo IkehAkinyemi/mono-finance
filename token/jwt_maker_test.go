@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
- func TestJWTMaker(t *testing.T) {
+func TestJWTMaker(t *testing.T) {
 	maker, err := NewJWTMaker(utils.RandomString(32))
 	require.NoError(t, err)
 
@@ -31,9 +31,9 @@ import (
 	require.Equal(t, username, payload.Username)
 	require.WithinDuration(t, issuedAt, payload.IssuedAt, time.Second)
 	require.WithinDuration(t, expiredAt, payload.ExpiredAt, time.Second)
- }
+}
 
- func TestExpiredJWTToken(t *testing.T) {
+func TestExpiredJWTToken(t *testing.T) {
 	maker, err := NewJWTMaker(utils.RandomString(32))
 	require.NoError(t, err)
 
@@ -45,9 +45,9 @@ import (
 	require.Error(t, err)
 	require.EqualError(t, err, ErrExpiredToken.Error())
 	require.Nil(t, payload)
- }
+}
 
- func TestInvalidJWTTokenAlgNone(t *testing.T) {
+func TestInvalidJWTTokenAlgNone(t *testing.T) {
 	payload, err := NewPayload(utils.RandomOwner(), time.Minute)
 	require.NoError(t, err)
 
@@ -62,4 +62,4 @@ import (
 	require.Error(t, err)
 	require.EqualError(t, err, ErrInvalidToken.Error())
 	require.Nil(t, payload)
- }
+}

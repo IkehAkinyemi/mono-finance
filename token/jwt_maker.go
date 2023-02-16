@@ -37,7 +37,7 @@ func (maker *JWTMaker) CreateToken(username string, duration time.Duration) (str
 
 // VerifyToken checks if the JWT token is valid or not
 func (maker *JWTMaker) VerifyToken(token string) (*Payload, error) {
-	keyFunc := func (token *jwt.Token) (interface{}, error) {
+	keyFunc := func(token *jwt.Token) (interface{}, error) {
 		_, ok := token.Method.(*jwt.SigningMethodHMAC)
 		if !ok {
 			return nil, ErrInvalidToken
@@ -61,5 +61,3 @@ func (maker *JWTMaker) VerifyToken(token string) (*Payload, error) {
 
 	return payload, nil
 }
-
-

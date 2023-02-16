@@ -28,7 +28,7 @@ func main() {
 	if err != nil {
 		log.Fatal("cannot create server: ", err)
 	}
-	
+
 	if err := server.Start(fmt.Sprint(config.ServerAddress)); err != nil {
 		log.Fatalf("error occur starting server: %v", err)
 	}

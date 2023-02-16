@@ -13,9 +13,9 @@ import (
 
 // A Server serves HTTP requests for the banking system
 type Server struct {
-	config utils.Config
-	store  db.Store
-	router *gin.Engine
+	config     utils.Config
+	store      db.Store
+	router     *gin.Engine
 	tokenMaker token.Maker
 }
 
@@ -27,8 +27,8 @@ func NewServer(config utils.Config, store db.Store) (*Server, error) {
 	}
 
 	server := &Server{
-		config: config,
-		store: store,
+		config:     config,
+		store:      store,
 		tokenMaker: tokenMaker,
 	}
 	router := gin.Default()

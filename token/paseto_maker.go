@@ -11,7 +11,7 @@ import (
 
 // PasetoMaker is a PASETO token maker
 type PasetoMaker struct {
-	paseto *paseto.V2
+	paseto       *paseto.V2
 	symmetricKey []byte
 }
 
@@ -21,7 +21,7 @@ func NewPasetoMaker(symmetricKey string) (Maker, error) {
 	}
 
 	maker := &PasetoMaker{
-		paseto: paseto.NewV2(),
+		paseto:       paseto.NewV2(),
 		symmetricKey: []byte(symmetricKey),
 	}
 
@@ -54,6 +54,3 @@ func (maker *PasetoMaker) VerifyToken(token string) (*Payload, error) {
 
 	return payload, nil
 }
-
-
-

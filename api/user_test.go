@@ -21,7 +21,7 @@ import (
 )
 
 type eqCreateUserParamsMatcher struct {
-	arg db.CreateUserParams
+	arg      db.CreateUserParams
 	password string
 }
 
@@ -69,9 +69,9 @@ func TestCreateUser(t *testing.T) {
 			},
 			buildStubs: func(ms *mockdb.MockStore) {
 				arg := db.CreateUserParams{
-					Username: user.Username,
-					FullName: user.FullName,
-					Email:    user.Email,
+					Username:       user.Username,
+					FullName:       user.FullName,
+					Email:          user.Email,
 					HashedPassword: hashedPassword,
 				}
 
@@ -226,4 +226,3 @@ func requireBodyMatchUser(t *testing.T, body *bytes.Buffer, user db.User) {
 	require.Equal(t, user.Username, gotUser.Username)
 	require.Empty(t, gotUser.HashedPassword)
 }
- 
