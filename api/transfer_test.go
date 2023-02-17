@@ -17,13 +17,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TODO: write unit test for CreateTransfer handler
+// TODO: Fix faling unit test for CreateTransfer handler
 func TestTransferAPI(t *testing.T) {
 	amount := int64(10)
 
-	account1 := randomAccount()
-	account2 := randomAccount()
-	account3 := randomAccount()
+	user1, _ := randomUser(t)
+	user2, _ := randomUser(t)
+	user3, _ := randomUser(t)
+	
+	account1 :=randomAccount(user1.Username)
+	account2 := randomAccount(user2.Username)
+	account3 := randomAccount(user3.Username)
 
 	testCases := []struct {
 		name          string
