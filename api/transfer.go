@@ -62,7 +62,7 @@ func (s *Server) validAccount(ctx *gin.Context, accountID int64, currency string
 	account, err := s.store.GetAccount(ctx, accountID)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusBadRequest, errorResponse(err))
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
 			return account, false
 		}
 
