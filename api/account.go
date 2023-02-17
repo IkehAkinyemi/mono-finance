@@ -115,6 +115,7 @@ type updateAccountRequestID struct {
 
 type updateAccountRequestBalance struct {
 	Balance int64 `json:"balance" binding:"required"`
+	Currency      string `json:"currency" binding:"required,currency"`
 }
 
 func (s *Server) updateAccount(ctx *gin.Context) {
@@ -141,6 +142,10 @@ func (s *Server) updateAccount(ctx *gin.Context) {
 		default:
 			ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		}
+		return
+	}
+
+	if _, valid := s.validAccount(ctx, req.ID, reqBody.Currency); !valid {
 		return
 	}
 

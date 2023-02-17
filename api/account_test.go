@@ -443,6 +443,7 @@ func TestUpdateAccount(t *testing.T) {
 
 	reqBody := updateAccountRequestBalance{
 		Balance: utils.RandomMoney(),
+		Currency: account.Currency,
 	}
 
 	arg := db.AddAccountBalanceParams{
@@ -471,7 +472,7 @@ func TestUpdateAccount(t *testing.T) {
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
 					GetAccount(gomock.Any(), gomock.Eq(account.ID)).
-					Times(1).
+					Times(2).
 					Return(account, nil)
 
 				store.EXPECT().
