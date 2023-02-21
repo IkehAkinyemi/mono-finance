@@ -3,8 +3,6 @@ name: Deploy to production
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   build:
@@ -28,6 +26,9 @@ jobs:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         REPOSITORY: monofinance
         IMAGE_TAG: ${{ github.sha }}
+      run: |
+        echo "check working directory"
+        pwd
       run: |
         docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
         docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
