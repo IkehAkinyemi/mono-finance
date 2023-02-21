@@ -1,0 +1,18 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:12-alpine
+    environment:
+      - POSTGRES_USER=mono_finance
+      - POSTGRES_PASSWORD=Akinyemi
+      - POSTGRES_DB=mono_finance
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_SOURCE=postgresql://mono_finance:Akinyemi@postgres:5432/mono_finance?sslmode=disable
+    entrypoint: ["/app/wait-for.sh", "postgres:5432", "--", "/app/start.sh"]
+    command: ["/app/main"]
