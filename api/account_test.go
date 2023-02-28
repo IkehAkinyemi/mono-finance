@@ -26,7 +26,7 @@ func TestGetAccountAPI(t *testing.T) {
 	testCases := []struct {
 		name          string
 		accountID     int64
-		setupAuth func(t *testing.T, request *http.Request, tokenMaker token.Maker)
+		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
 		buildStubs    func(store *mockdb.MockStore)
 		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
 	}{
@@ -157,7 +157,7 @@ func TestCreateAccountAPI(t *testing.T) {
 
 	testCases := []struct {
 		name          string
-		setupAuth func(t *testing.T, request *http.Request, tokenMaker token.Maker)
+		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
 		genReqBody    func() io.Reader
 		buildStubs    func(store *mockdb.MockStore)
 		checkResponse func(t *testing.T, recorder *httptest.ResponseRecorder)
@@ -191,12 +191,12 @@ func TestCreateAccountAPI(t *testing.T) {
 			},
 		},
 		{
-			name:      "NoAuthorization",
+			name: "NoAuthorization",
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
 			},
 			buildStubs: func(store *mockdb.MockStore) {
 				store.EXPECT().
-				CreateAccount(gomock.Any(), gomock.Any()).
+					CreateAccount(gomock.Any(), gomock.Any()).
 					Times(0)
 			},
 			checkResponse: func(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -432,7 +432,6 @@ func TestListAccountsAPI(t *testing.T) {
 	}
 }
 
-
 func TestUpdateAccount(t *testing.T) {
 	user, _ := randomUser(t)
 	account := randomAccount(user.Username)
@@ -442,7 +441,7 @@ func TestUpdateAccount(t *testing.T) {
 	}
 
 	reqBody := updateAccountRequestBalance{
-		Balance: utils.RandomMoney(),
+		Balance:  utils.RandomMoney(),
 		Currency: account.Currency,
 	}
 
@@ -563,7 +562,7 @@ func TestUpdateAccount(t *testing.T) {
 					Times(1).
 					Return(db.Account{}, sql.ErrNoRows)
 
-					store.EXPECT().
+				store.EXPECT().
 					AddAccountBalance(gomock.Any(), gomock.Any()).
 					Times(0)
 			},
@@ -644,7 +643,7 @@ func TestDeleteAccount(t *testing.T) {
 			accountID: account.ID,
 			buildStubs: func(store *mockdb.MockStore) {
 				arg := db.DeleteAccountParams{
-					ID: account.ID,
+					ID:    account.ID,
 					Owner: account.Owner,
 				}
 				store.EXPECT().
@@ -664,7 +663,7 @@ func TestDeleteAccount(t *testing.T) {
 			accountID: account.ID,
 			buildStubs: func(store *mockdb.MockStore) {
 				arg := db.DeleteAccountParams{
-					ID: account.ID,
+					ID:    account.ID,
 					Owner: account.Owner,
 				}
 				store.EXPECT().
@@ -697,7 +696,7 @@ func TestDeleteAccount(t *testing.T) {
 			accountID: account.ID,
 			buildStubs: func(store *mockdb.MockStore) {
 				arg := db.DeleteAccountParams{
-					ID: account.ID,
+					ID:    account.ID,
 					Owner: account.Owner,
 				}
 
@@ -718,7 +717,7 @@ func TestDeleteAccount(t *testing.T) {
 			accountID: account.ID,
 			buildStubs: func(store *mockdb.MockStore) {
 				arg := db.DeleteAccountParams{
-					ID: account.ID,
+					ID:    account.ID,
 					Owner: account.Owner,
 				}
 

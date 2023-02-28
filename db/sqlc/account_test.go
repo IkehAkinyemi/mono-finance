@@ -74,10 +74,10 @@ func TestDeleteAccount(t *testing.T) {
 	account1 := createRandomAccount(t)
 
 	arg := DeleteAccountParams{
-		ID: account1.ID,
+		ID:    account1.ID,
 		Owner: account1.Owner,
 	}
-	
+
 	err := testQueries.DeleteAccount(context.Background(), arg)
 	require.NoError(t, err)
 
@@ -94,7 +94,7 @@ func TestListAccounts(t *testing.T) {
 	}
 
 	arg := ListAccountsParams{
-		Owner: lastAccount.Owner,
+		Owner:  lastAccount.Owner,
 		Limit:  5,
 		Offset: 0,
 	}
