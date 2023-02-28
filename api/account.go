@@ -73,7 +73,7 @@ func (s *Server) getAccount(ctx *gin.Context) {
 	if account.Owner != authPayload.Username {
 		err := errors.New("account doesn't belong to the authenticated user")
 		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
-		return 
+		return
 	}
 
 	ctx.JSON(http.StatusOK, account)
@@ -95,7 +95,7 @@ func (s *Server) listAccounts(ctx *gin.Context) {
 	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 
 	arg := db.ListAccountsParams{
-		Owner: authPayload.Username,
+		Owner:  authPayload.Username,
 		Limit:  req.PageSize,
 		Offset: (req.PageID - 1) * req.PageSize,
 	}
@@ -114,8 +114,8 @@ type updateAccountRequestID struct {
 }
 
 type updateAccountRequestBalance struct {
-	Balance int64 `json:"balance" binding:"required"`
-	Currency      string `json:"currency" binding:"required,currency"`
+	Balance  int64  `json:"balance" binding:"required"`
+	Currency string `json:"currency" binding:"required,currency"`
 }
 
 func (s *Server) updateAccount(ctx *gin.Context) {
@@ -183,8 +183,8 @@ func (s *Server) DeleteAccount(ctx *gin.Context) {
 
 	authPayload := ctx.MustGet(authorizationPayloadKey).(*token.Payload)
 
-	arg := db.DeleteAccountParams {
-		ID: req.ID,
+	arg := db.DeleteAccountParams{
+		ID:    req.ID,
 		Owner: authPayload.Username,
 	}
 

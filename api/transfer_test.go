@@ -25,8 +25,8 @@ func TestTransferAPI(t *testing.T) {
 	user1, _ := randomUser(t)
 	user2, _ := randomUser(t)
 	user3, _ := randomUser(t)
-	
-	account1 :=randomAccount(user1.Username)
+
+	account1 := randomAccount(user1.Username)
 	account2 := randomAccount(user2.Username)
 	account3 := randomAccount(user3.Username)
 
@@ -37,7 +37,7 @@ func TestTransferAPI(t *testing.T) {
 	testCases := []struct {
 		name          string
 		body          gin.H
-		setupAuth func(t *testing.T, request *http.Request, tokenMaker token.Maker)
+		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
 		buildStubs    func(store *mockdb.MockStore)
 		checkResponse func(recorder *httptest.ResponseRecorder)
 	}{
