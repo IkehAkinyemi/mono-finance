@@ -21,19 +21,19 @@ type createUserRequest struct {
 }
 
 type userResponse struct {
-	Username  string    `json:"username"`
-	FullName  string    `json:"full_name"`
-	Email     string    `json:"email"`
-	CreatedAt time.Time `json:"created_at"`
+	Username          string    `json:"username"`
+	FullName          string    `json:"full_name"`
+	Email             string    `json:"email"`
+	CreatedAt         time.Time `json:"created_at"`
 	PasswordChangedAt time.Time `json:"password_changed_at"`
 }
 
 func newUserResponse(user db.User) userResponse {
 	return userResponse{
-		Username:  user.Username,
-		FullName:  user.FullName,
-		Email:     user.Email,
-		CreatedAt: user.CreatedAt,
+		Username:          user.Username,
+		FullName:          user.FullName,
+		Email:             user.Email,
+		CreatedAt:         user.CreatedAt,
 		PasswordChangedAt: user.PasswordChangedAt,
 	}
 }
@@ -142,12 +142,12 @@ func (s *Server) loginUser(ctx *gin.Context) {
 	}
 
 	response := loginUserResponse{
-		SessionID:   session.ID,
-		AccessToken: accessToken,
-		AccessTokenExpiresAt: accessPayload.ExpiredAt,
-		RefreshToken: refreshToken,
+		SessionID:             session.ID,
+		AccessToken:           accessToken,
+		AccessTokenExpiresAt:  accessPayload.ExpiredAt,
+		RefreshToken:          refreshToken,
 		RefreshTokenExpiresAt: refreshPayload.ExpiredAt,
-		User:        newUserResponse(user),
+		User:                  newUserResponse(user),
 	}
 
 	ctx.JSON(http.StatusOK, response)
