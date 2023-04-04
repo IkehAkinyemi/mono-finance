@@ -1,0 +1,34 @@
+package gapi
+
+import (
+	"fmt"
+
+	db "github.com/IkehAkinyemi/mono-finance/db/sqlc"
+	"github.com/IkehAkinyemi/mono-finance/pb"
+	"github.com/IkehAkinyemi/mono-finance/token"
+	"github.com/IkehAkinyemi/mono-finance/utils"
+)
+
+// A Server serves gRPC requests for the banking system
+type Server struct {
+	pb.UnimplementedMonoFinanceServer
+	config     utils.Config
+	store      db.Store
+	tokenMaker token.Maker
+}
+
+// NewServer create a new gRPC server and setup routing.
+func NewServer(config utils.Config, store db.Store) (*Server, error) {
+	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create token maker: %w", err)
+	}
+
+	server := &Server{
+		config:     config,
+		store:      store,
+		tokenMaker: tokenMaker,
+	}
+
+	return server, nil
+}
