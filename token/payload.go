@@ -9,7 +9,7 @@ import (
 
 // Differen types of error returned by the VerifyToken
 var (
-	ErrInvalidToken = errors.New("token is valid")
+	ErrInvalidToken = errors.New("token is invalid")
 	ErrExpiredToken = errors.New("token has expired")
 )
 
