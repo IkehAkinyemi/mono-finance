@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"embed"
 	"fmt"
 	"log"
 	"net"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/IkehAkinyemi/mono-finance/api"
 	db "github.com/IkehAkinyemi/mono-finance/db/sqlc"
+	"github.com/IkehAkinyemi/mono-finance/doc/swagger"
 	"github.com/IkehAkinyemi/mono-finance/gapi"
 	"github.com/IkehAkinyemi/mono-finance/pb"
 	"github.com/IkehAkinyemi/mono-finance/utils"
@@ -19,6 +21,9 @@ import (
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/encoding/protojson"
 )
+
+//go:embed doc/swagger
+var staticFile embed.FS
 
 func main() {
 	config, err := utils.LoadConfig(".")
@@ -82,6 +87,9 @@ func runGatewayServer(config utils.Config, store db.Store) {
 	mux := http.NewServeMux()
 	mux.Handle("/", grpcMux)
 
+	fs := http.FileServer(http.FS(swagger.StatisFile))
+	mux.Handle("/swagger/", http.StripPrefix("/swagger/", fs))
+
 	listener, err := net.Listen("tcp", config.HTTPServerAddress)
 	if err != nil {
 		log.Fatalf("cannot start listener: %v", err)
@@ -104,3 +112,4 @@ func runGinServer(config utils.Config, store db.Store) {
 		log.Fatalf("error occur starting server: %v", err)
 	}
 }
+
