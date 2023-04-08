@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"database/sql"
-	"embed"
 	"fmt"
 	"log"
 	"net"
@@ -15,15 +14,16 @@ import (
 	"github.com/IkehAkinyemi/mono-finance/gapi"
 	"github.com/IkehAkinyemi/mono-finance/pb"
 	"github.com/IkehAkinyemi/mono-finance/utils"
+	migrate "github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	_ "github.com/lib/pq"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/encoding/protojson"
 )
-
-//go:embed doc/swagger
-var staticFile embed.FS
 
 func main() {
 	config, err := utils.LoadConfig(".")
@@ -36,9 +36,24 @@ func main() {
 		log.Fatal(err)
 	}
 
+	runDBMigrations(config.MigrationURL, config.DBSource)
+
 	store := db.NewStore(conn)
 	go runGatewayServer(config, store)
 	runGRPCServer(config, store)
+}
+
+func runDBMigrations(migrationURL string, dbSource string) {
+	migration, err := migrate.New(migrationURL, dbSource)
+	if err != nil {
+		log.Fatalf("cannot create a new migrate instance: %v", err)
+	}
+
+	if err := migration.Up(); err != nil && err != migrate.ErrNoChange {
+		log.Fatalf("failed to run migrateup: %v", err)
+	}
+	
+	log.Println("db migrated successfully")
 }
 
 func runGRPCServer(config utils.Config, store db.Store) {
@@ -112,4 +127,3 @@ func runGinServer(config utils.Config, store db.Store) {
 		log.Fatalf("error occur starting server: %v", err)
 	}
 }
-
