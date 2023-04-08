@@ -9,13 +9,13 @@ import (
 
 const (
 	grpcGatewayUserAgentHeader = "grpcgateway-user-agent"
-	userAgentsHeaser = "user-agent"
-	xForwardedForHeader = "x-forwarded-for"
+	userAgentsHeaser           = "user-agent"
+	xForwardedForHeader        = "x-forwarded-for"
 )
 
 type Metadata struct {
 	UserAgent string
-	ClientIP string
+	ClientIP  string
 }
 
 func (server *Server) extraMetadata(ctx context.Context) *Metadata {
@@ -38,6 +38,6 @@ func (server *Server) extraMetadata(ctx context.Context) *Metadata {
 	if p, ok := peer.FromContext(ctx); ok {
 		mtdt.ClientIP = p.Addr.String()
 	}
-	
-	return  mtdt
+
+	return mtdt
 }
