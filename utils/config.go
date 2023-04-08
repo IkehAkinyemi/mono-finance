@@ -9,6 +9,7 @@ import (
 // A Config stores configurations or environment variables
 type Config struct {
 	DBDriver             string        `mapstructure:"DB_DRIVER"`
+	Environment             string        `mapstructure:"ENVIRONMENT"`
 	DBSource             string        `mapstructure:"DB_SOURCE"`
 	MigrationURL         string        `mapstructure:"MIGRATION_URL"`
 	HTTPServerAddress    string        `mapstructure:"HTTP_SERVER_ADDRESS"`

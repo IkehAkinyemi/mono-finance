@@ -4,9 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log"
 	"net"
 	"net/http"
+	"os"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 
 	"github.com/IkehAkinyemi/mono-finance/api"
 	db "github.com/IkehAkinyemi/mono-finance/db/sqlc"
@@ -28,12 +31,16 @@ import (
 func main() {
 	config, err := utils.LoadConfig(".")
 	if err != nil {
-		log.Fatal("could not load config file", err)
+		log.Fatal().Err(err).Msg("could not load config file")
 	}
 
+	if config.Environment == "development" {
+		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	}
+ 
 	conn, err := sql.Open(config.DBDriver, config.DBSource)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Msg("cannot connect to db")
 	}
 
 	runDBMigrations(config.MigrationURL, config.DBSource)
@@ -46,42 +53,44 @@ func main() {
 func runDBMigrations(migrationURL string, dbSource string) {
 	migration, err := migrate.New(migrationURL, dbSource)
 	if err != nil {
-		log.Fatalf("cannot create a new migrate instance: %v", err)
+		log.Fatal().Err(err).Msg("cannot create a new migrate instance")
 	}
 
 	if err := migration.Up(); err != nil && err != migrate.ErrNoChange {
-		log.Fatalf("failed to run migrateup: %v", err)
+		log.Fatal().Err(err).Msg("failed to run migrateup")
 	}
 	
-	log.Println("db migrated successfully")
+	log.Info().Msg("db migrated successfully")
 }
 
 func runGRPCServer(config utils.Config, store db.Store) {
 	server, err := gapi.NewServer(config, store)
 	if err != nil {
-		log.Fatal("cannot create monofinance server: ", err)
+		log.Fatal().Err(err).Msg("cannot create monofinance server")
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcLogger := grpc.UnaryInterceptor(gapi.GRPCLogger)
+
+	grpcServer := grpc.NewServer(grpcLogger)
 	pb.RegisterMonoFinanceServer(grpcServer, server)
 	reflection.Register(grpcServer)
 
 	listener, err := net.Listen("tcp", config.GRPCServerAddress)
 	if err != nil {
-		log.Fatalf("cannot start listener: %v", err)
+		log.Fatal().Err(err).Msg("cannot start listener")
 	}
 
-	log.Printf("Starting gRPC server, port = %s", listener.Addr().String())
+	log.Info().Msg("Starting gRPC server, port " + listener.Addr().String())
 	err = grpcServer.Serve(listener)
 	if err != nil {
-		log.Fatalf("cannot start gRPC server: %v", err)
+		log.Fatal().Err(err).Msg("cannot start gRPC server")
 	}
 }
 
 func runGatewayServer(config utils.Config, store db.Store) {
 	server, err := gapi.NewServer(config, store)
 	if err != nil {
-		log.Fatal("cannot create monofinance server: ", err)
+		log.Fatal().Err(err).Msg("cannot create monofinance server")
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -107,23 +116,25 @@ func runGatewayServer(config utils.Config, store db.Store) {
 
 	listener, err := net.Listen("tcp", config.HTTPServerAddress)
 	if err != nil {
-		log.Fatalf("cannot start listener: %v", err)
+		log.Fatal().Err(err).Msg("cannot start listener")
 	}
 
-	log.Printf("Starting gRPC Gateway server, port = %s", listener.Addr().String())
-	err = http.Serve(listener, mux)
+	log.Info().Msg("Starting gRPC Gateway server, port " + listener.Addr().String())
+
+	handler := gapi.HTTPLogger(mux)
+	err = http.Serve(listener, handler)
 	if err != nil {
-		log.Fatalf("cannot start gRPC server: %v", err)
+		log.Fatal().Err(err).Msg("cannot start gRPC server")
 	}
 }
 
 func runGinServer(config utils.Config, store db.Store) {
 	server, err := api.NewServer(config, store)
 	if err != nil {
-		log.Fatal("cannot create server: ", err)
+		log.Fatal().Err(err).Msg("cannot create server")
 	}
 
 	if err := server.Start(fmt.Sprint(config.HTTPServerAddress)); err != nil {
-		log.Fatalf("error occur starting server: %v", err)
+		log.Fatal().Err(err).Msg("error occur starting server")
 	}
 }
