@@ -16,6 +16,7 @@ import (
 	db "github.com/IkehAkinyemi/mono-finance/db/sqlc"
 	"github.com/IkehAkinyemi/mono-finance/doc/swagger"
 	"github.com/IkehAkinyemi/mono-finance/gapi"
+	"github.com/IkehAkinyemi/mono-finance/mail"
 	"github.com/IkehAkinyemi/mono-finance/pb"
 	"github.com/IkehAkinyemi/mono-finance/utils"
 	"github.com/IkehAkinyemi/mono-finance/worker"
@@ -52,7 +53,7 @@ func main() {
 		Addr: config.RedisAddress,
 	}
 	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
-	go runTaskProcessor(redisOpt, store)
+	go runTaskProcessor(config, redisOpt, store)
 	go runGatewayServer(config, store, taskDistributor)
 	runGRPCServer(config, store, taskDistributor)
 }
@@ -70,8 +71,9 @@ func runDBMigrations(migrationURL string, dbSource string) {
 	log.Info().Msg("db migrated successfully")
 }
 
-func runTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store) {
-	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store)
+func runTaskProcessor(config utils.Config, redisOpt asynq.RedisClientOpt, store db.Store) {
+	mailer := mail.NewGmailSender(config.EmailSenderName, config.EmailSenderAddress, config.EmailSenderPassword)
+	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store, mailer)
 	log.Info().Msg("starting task processor")
 	err := taskProcessor.Start()
 	if err != nil {
