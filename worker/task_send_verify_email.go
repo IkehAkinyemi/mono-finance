@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	db "github.com/IkehAkinyemi/mono-finance/db/sqlc"
+	"github.com/IkehAkinyemi/mono-finance/utils"
 	"github.com/hibiken/asynq"
 	"github.com/rs/zerolog/log"
 )
@@ -59,7 +61,27 @@ func (processor *RedisTaskProcessor) ProcessTaskSendVerifyEmail(
 		return fmt.Errorf("failed to get error: %w", err)
 	}
 
-	// TODO: send email to user
+	verifyEmail, err := processor.store.CreateVerifyEmail(ctx, db.CreateVerifyEmailParams{
+		Username: user.Username,
+		Email: user.Email,
+		SecretCode: utils.RandomString(64),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create verify email: %w", err)
+	}
+
+	verifyUrl := fmt.Sprintf("https://app.monofinance.click/verify_email?id=%d&secret_code=%s", verifyEmail.ID, verifyEmail.SecretCode)
+	subject := "Welcome to Mono Finance"
+	content := fmt.Sprintf(`Hello %s, <br/>
+	Thank you for registering with us! <br/>
+	Please <a href="%s">Click here</a> to verify your email address.<br/>
+	`, user.Username, verifyUrl)
+	to := []string{verifyEmail.Email}
+	err = processor.mailer.SendEmail(subject, content, to, nil, nil, nil)
+	if err != nil {
+		return fmt.Errorf("failed to send verify email: %w", err)
+	}
+
 	log.Info().Str("type", task.Type()).
 		Bytes("payload", task.Payload()).
 		Str("email", user.Email).

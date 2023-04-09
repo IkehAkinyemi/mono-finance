@@ -8,9 +8,9 @@ import (
 )
 
 func TestSendEmailWithGmail(t *testing.T) {
-	if testing.Short() {
-		t.Skip()
-	}
+	// if testing.Short() {
+	// 	t.Skip()
+	// }
 
 	config, err := utils.LoadConfig("..")
 	require.NoError(t, err)
@@ -19,10 +19,10 @@ func TestSendEmailWithGmail(t *testing.T) {
 
 	subject := "A test email"
 	content := `
-	<h1>Hello world</h1>
-	<p>This is a test message from <a href="https://github.com/IkehAkinyemi/mono-finance">Tech School</a></p>
+	<h1>Hello gengs💩!</h1>
+	<p>This is a test message from <a href="https://github.com/IkehAkinyemi/mono-finance">Mono Finance</a></p>
 	`
-	to := []string{"mono.finance.click@gmail.com", "mrikehchukwuka@gmail.com"}
+	to := []string{"alerudivine@gmail.com", "mrikehchukwuka@gmail.com", "umavictor11@gmail.com", "chrisebuberoland@gmail.com "}
 	attachFiles := []string{"../README.md"}
 
 	err = sender.SendEmail(subject, content, to, nil, nil, attachFiles)
