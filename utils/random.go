@@ -10,7 +10,7 @@ import (
 const alphabets = "abcdefghijklmnopqrstuvwxyz"
 
 func init() {
-	rand.Seed(time.Now().UnixNano())
+	rand.New(rand.NewSource(time.Now().UnixNano()))
 }
 
 // RandomInt generates random integer between min and max.
