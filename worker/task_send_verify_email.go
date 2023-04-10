@@ -70,7 +70,7 @@ func (processor *RedisTaskProcessor) ProcessTaskSendVerifyEmail(
 		return fmt.Errorf("failed to create verify email: %w", err)
 	}
 
-	verifyUrl := fmt.Sprintf("https://app.monofinance.click/verify_email?id=%d&secret_code=%s", verifyEmail.ID, verifyEmail.SecretCode)
+	verifyUrl := fmt.Sprintf("http://localhost:8080/v1/verify_email?email_id=%d&secret_code=%s", verifyEmail.ID, verifyEmail.SecretCode)
 	subject := "Welcome to Mono Finance"
 	content := fmt.Sprintf(`Hello %s, <br/>
 	Thank you for registering with us! <br/>

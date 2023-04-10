@@ -13,7 +13,7 @@ type CreateUserTxResult struct {
 	User User
 }
 
-// CreateUserTx performs a
+// CreateUserTx performs a create user db query and send task message to redis.
 func (store *SQLStore) CreateUserTx(ctx context.Context, arg CreateUserTxParams) (CreateUserTxResult, error) {
 	var result CreateUserTxResult
 
