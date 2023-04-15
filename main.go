@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"database/sql"
+	"embed"
 	"fmt"
+	"io/fs"
 	"net"
 	"net/http"
 	"os"
@@ -14,7 +16,6 @@ import (
 
 	"github.com/IkehAkinyemi/mono-finance/api"
 	db "github.com/IkehAkinyemi/mono-finance/db/sqlc"
-	"github.com/IkehAkinyemi/mono-finance/doc/swagger"
 	"github.com/IkehAkinyemi/mono-finance/gapi"
 	"github.com/IkehAkinyemi/mono-finance/mail"
 	"github.com/IkehAkinyemi/mono-finance/pb"
@@ -30,6 +31,9 @@ import (
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/encoding/protojson"
 )
+
+//go:embed doc
+var content embed.FS
 
 func main() {
 	config, err := utils.LoadConfig(".")
@@ -129,8 +133,13 @@ func runGatewayServer(config utils.Config, store db.Store, taskDistributor worke
 	mux := http.NewServeMux()
 	mux.Handle("/", grpcMux)
 
-	fs := http.FileServer(http.FS(swagger.StatisFile))
-	mux.Handle("/swagger/", http.StripPrefix("/swagger/", fs))
+	fsys, err := fs.Sub(content, "doc/swagger")
+	if err != nil {
+		log.Fatal().Err(err).Msg("can generate swagger docs")
+	}
+
+	fsysHandler := http.FileServer(http.FS(fsys))
+	mux.Handle("/swagger/", http.StripPrefix("/swagger/", fsysHandler))
 
 	listener, err := net.Listen("tcp", config.HTTPServerAddress)
 	if err != nil {
