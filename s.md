@@ -38,39 +38,6 @@ The application follows a clean architecture pattern, separating concerns into d
 
 The application can serve both REST (via Gin) and gRPC endpoints, with the gRPC gateway translating RESTful requests to gRPC calls.
 
-## Architecture Diagram
-
-```
-+-------------------+      +------------------+
-|                   |      |                  |
-|  Client (Web/App) +------+ Nginx/Ingress    |
-|                   |      |                  |
-+-------------------+      +--------+---------+
-                                     |
-                                     v
-+-------------------+      +------------------+      +---------------+
-|                   |      |                  |      |               |
-|  gRPC Gateway     +----->+  gRPC API Server +----->+  Business     |
-|  (REST to gRPC)   |      |                  |      |  Logic        |
-|                   |      |                  |      |               |
-+-------------------+      +------------------+      +-------+-------+
-                                                             |
-                  +----------------+                         |
-                  |                |                         |
-                  |  Redis         |                         |
-                  |  (Task Queue)  |                         |
-                  |                |                         |
-                  +-------+--------+                         |
-                          ^                                  |
-                          |                                  |
-                          |                                  v
-+-------------------+     |            +------------------+  |   +---------------+
-|                   |     |            |                  |  |   |               |
-|  Worker           +-----+            |  DB Store        +<-+   |  PostgreSQL   |
-|  (Email, etc.)    |                  |  (SQLC)          +----->+  Database     |
-|                   |                  |                  |      |               |
-+-------------------+                  +------------------+      +---------------+
-```
 
 ## Features
 
@@ -156,9 +123,7 @@ The gRPC API provides the same functionality with Protocol Buffers:
 │   ├── mock/             # Mock store for testing
 │   ├── query/            # SQL queries
 │   └── sqlc/             # Generated Go code from SQL
-├── docs/                 
-│   ├── swagger/          # Database migration files
-├── gapi/                 # Endpoints/routes documentation
+├── gapi/                 # gRPC API handlers
 ├── mail/                 # Email sending functionality
 ├── pb/                   # Protocol buffer generated files
 ├── proto/                # Protocol buffer definitions
